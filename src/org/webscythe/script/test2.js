@@ -4,7 +4,7 @@ w.includeJS("http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.js");
 
 w.evaluate(function() {
     $("#email").val("vnikic@gmail.com");
-    $("#pass").val("minimoris");
+    $("#pass").val("mama");
     $("#login_form").submit();
 });
 wb.saveStringToFile(w.getContent(), "c:/temp/webscythe/fb.html");
