@@ -16,4 +16,8 @@ public class SystemModule {
         CommonUtil.saveTextToFile(file, content, charset);
     }
 
+    public void sleep(long milliseconds) throws InterruptedException {
+        Thread.sleep(milliseconds);
+    }
+
 }

@@ -5,7 +5,7 @@ var w = wb.createWindow("https://www.facebook.com/");
 w.includeJS("http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.js");
 
 w.evaluate(function() {
-    $("#email").val("vnikic@gmail.com");
+    $("#email").val("email");
     $("#pass").val("mama");
     $("#login_form").submit();
 });

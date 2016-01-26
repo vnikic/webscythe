@@ -1,6 +1,6 @@
 var companyPath = "TIPOPLASTIKA DOO GORNJI MILANOVAC_18720";
-var username = "bigz.rs";
-var password = "bigz222";
+var username = "uuu";
+var password = "ppp";
 
 var wb = new WebBrowser();
 var win = wb.createWindow("http://www.scoring.rs/");

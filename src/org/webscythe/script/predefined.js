@@ -101,4 +101,8 @@ var System = function () {
         }
         this.__sys.saveText(content, filename, charset);
     }
+
+    this.sleep = function(time) {
+        this.__sys.sleep(time);
+    }
 };
