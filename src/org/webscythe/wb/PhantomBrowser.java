@@ -52,7 +52,7 @@ public class PhantomBrowser {
             template = template.replaceAll("\\$\\{PORT\\}", String.valueOf(browserPort));
 
             String jsFileName = workingDir + "/phantom_input.js";
-            CommonUtil.saveStringToFile(new File(jsFileName), template, "utf-8");
+            CommonUtil.saveTextToFile(new File(jsFileName), template, "utf-8");
 
             ProcessBuilder pb = new ProcessBuilder(browserExecutablePath, jsFileName);
             process = pb.start();
@@ -93,7 +93,7 @@ public class PhantomBrowser {
 
     public void saveStringToFile(String content, String filename) {
         try {
-            CommonUtil.saveStringToFile(new File(filename), content, "UTF-8");
+            CommonUtil.saveTextToFile(new File(filename), content, "UTF-8");
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -9,10 +9,6 @@ var WebBrowser = function () {
         }
         return w;
     };
-
-    this.saveStringToFile = function(content, filename) {
-        this.__browser.saveStringToFile(content, filename);
-    }
 };
 
 
@@ -93,4 +89,16 @@ var WebBrowserWindow = function(browser, id) {
     this.includeJS = function(url) {
         this.__browser.includeJS(this.__id, url);
     };
+};
+
+
+var System = function () {
+    this.__sys = __WB.createModule("sys");
+
+    this.saveText = function(content, filename, charset) {
+        if (!charset) {
+            charset = "UTF-8";
+        }
+        this.__sys.saveText(content, filename, charset);
+    }
 };

@@ -93,7 +93,7 @@ public class CommonUtil {
      * @throws IOException
      * @throws UnsupportedEncodingException
      */
-    public static void saveStringToFile(File file, String content, String charset) throws IOException {
+    public static void saveTextToFile(File file, String content, String charset) throws IOException {
         FileOutputStream out = new FileOutputStream(file);
         byte[] data = content.getBytes(charset);
 
