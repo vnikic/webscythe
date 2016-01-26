@@ -13,6 +13,7 @@ var initPage = function(page, pageParams) {
         if (pageParams.useragent) {
             page.settings.userAgent = pageParams.useragent;
         }
+        page.settings.userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0";
         if (pageParams.username) {
             page.settings.username = pageParams.username;
         }
