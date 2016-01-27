@@ -1,9 +1,15 @@
 package org.webscythe.wb;
 
+import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.webscythe.utils.CommonUtil;
 
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.logging.Logger;
 
 public class PhantomBrowser {
@@ -91,10 +97,36 @@ public class PhantomBrowser {
         }
     }
 
-    public void saveStringToFile(String content, String filename) {
+    public void download(String urlString, String pageId, String fileName) {
         try {
-            CommonUtil.saveTextToFile(new File(filename), content, "UTF-8");
+            StringBuilder b = new StringBuilder();
+            JSONArray cookies = new JSONArray(getCookies(pageId));
+            for (int i = 0; i < cookies.length(); i++) {
+                JSONObject currCookie = cookies.getJSONObject(i);
+                String name = currCookie.optString("name", null);
+                String value = currCookie.optString("value", null);
+                if (name != null && value != null) {
+                    b.append(name).append("=").append(value).append(";");
+                }
+            }
+            URL url = new URL(urlString);
+            URLConnection conn = url.openConnection();
+            conn.setRequestProperty("Cookie", b.toString());
+
+            conn.connect();
+            InputStream connIn = conn.getInputStream();
+            FileOutputStream fileOut = new FileOutputStream(fileName);
+
+            IOUtils.copy(connIn, fileOut);
+
+            connIn.close();
+            fileOut.flush();
+            fileOut.close();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }

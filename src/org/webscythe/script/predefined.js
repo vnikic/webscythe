@@ -89,6 +89,10 @@ var WebBrowserWindow = function(browser, id) {
     this.includeJS = function(url) {
         this.__browser.includeJS(this.__id, url);
     };
+
+    this.download = function(url, fileName) {
+        this.__browser.download(url, this.__id, fileName);
+    };
 };
 
 
