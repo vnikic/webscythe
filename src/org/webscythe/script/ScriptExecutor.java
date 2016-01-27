@@ -30,7 +30,7 @@ public class ScriptExecutor {
             engine.put("__WB", webBrowserProxy);
 
             engine.eval(b.toString());
-        } catch (ScriptException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             webBrowserProxy.dispose();

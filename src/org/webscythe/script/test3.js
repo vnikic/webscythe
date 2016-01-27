@@ -3,6 +3,8 @@ var username = "uuu";
 var password = "ppp";
 
 var wb = new WebBrowser();
+var sys = new System();
+
 var win = wb.createWindow("http://www.scoring.rs/");
 win.evaluate(function() {
     setLanguage("en");
@@ -15,4 +17,4 @@ win.evaluate(function(u, p) {
 
 win.load("http://www.scoring.rs/Firma/" + companyPath);
 
-wb.saveStringToFile(win.getContent(), "c:/temp/webscythe/" + companyPath + ".html");
+sys.saveText(win.getContent(), "c:/temp/webscythe/" + companyPath + ".html");

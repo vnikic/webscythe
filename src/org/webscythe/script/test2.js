@@ -11,7 +11,7 @@ w.evaluate(function() {
 });
 sys.saveText(w.getContent(), "c:/temp/webscythe/fb.html");
 
-print("FIRST LINK TEXT IS: [" + w.evaluate(function() {
+sys.print("FIRST LINK TEXT IS: [" + w.evaluate(function() {
     var el = document.querySelector("a");
     return el.innerHTML;
 }) + "]");
