@@ -112,17 +112,17 @@ var System = function () {
             charset = "UTF-8";
         }
         this.__sys.saveText(content, filename, charset);
-    }
+    };
 
     this.sleep = function(time) {
         this.__sys.sleep(time);
-    }
+    };
 
     this.print = function(obj) {
         this.__sys.print(obj);
-    }
+    };
 
     this.println = function(obj) {
         this.__sys.println(obj);
-    }
+    };
 };

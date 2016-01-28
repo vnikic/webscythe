@@ -5,7 +5,7 @@ var win = wb.createWindow("http://mail.yahoo.com/");
 sys.sleep(2000);
 
 win.evaluate(function() {
-    document.querySelector("#login-username").value = "email";
+    document.querySelector("#login-username").value = "mail";
     document.querySelector("#login-passwd").value = "pass";
     document.querySelector("#mbr-login-form").submit();
 });

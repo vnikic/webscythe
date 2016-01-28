@@ -128,6 +128,9 @@ var service = server.listen(${PORT}, function (request, response) {
                 response.write("");
                 response.close();
             });
+            response.statusCode = 200;
+            response.write("");
+            response.close();
         } else if (action == "getcookies") {
             response.statusCode = 200;
             response.write(JSON.stringify(page.cookies));
