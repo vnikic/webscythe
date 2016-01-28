@@ -123,6 +123,13 @@ public class PhantomBrowser {
         fileOut.close();
     }
 
+    public String render(String pageId, String fileName, String type) {
+        logger.info("Rendering  page...");
+        String loadResult = new PhantomBridge(browserPort).render(pageId, fileName, type);
+        logger.info("Page rendered to file \"" + fileName + "\".");
+        return loadResult;
+    }
+
     public String load(String url, String paramsAsJsonStruct) {
         logger.info("Loading page " + url);
         String loadResult = new PhantomBridge(browserPort).load(url, paramsAsJsonStruct);

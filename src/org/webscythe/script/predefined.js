@@ -2,10 +2,10 @@ var WebBrowser = function () {
     this.__browser = __WB.createBrowser();
     this.__winCounter = 0;
 
-    this.createWindow = function(url) {
+    this.createWindow = function(url, settings) {
         var w = new WebBrowserWindow(this.__browser, "win" + this.__winCounter++);
         if (url) {
-            w.load(url);
+            w.load(url, settings);
         }
         return w;
     };
@@ -15,6 +15,7 @@ var WebBrowser = function () {
 var WebBrowserWindow = function(browser, id) {
     this.__browser = browser;
     this.__id = id;
+    this.__settings = {"page": this.__id};
 
     this.isFunction = function(obj) {
         return !!(obj && obj.constructor && obj.call && obj.apply);
@@ -63,10 +64,13 @@ var WebBrowserWindow = function(browser, id) {
         return code;
     };
 
-    this.load = function(url) {
-        var params = {};    // todo: add default params for this window
-        params.page = this.__id;
-        return this.__browser.load(url, JSON.stringify(params));
+    this.load = function(url, settings) {
+        if (settings && toString.call(settings) === '[object Object]') {
+            for (var key in settings) {
+                this.__settings[key] = settings[key];
+            }
+        }
+        return this.__browser.load(url, JSON.stringify(this.__settings));
     };
 
     this.getContent = function() {
@@ -92,6 +96,10 @@ var WebBrowserWindow = function(browser, id) {
 
     this.download = function(url, fileName) {
         this.__browser.download(url, this.__id, fileName);
+    };
+
+    this.render = function(fileName, type) {
+        this.__browser.render(this.__id, fileName, type);
     };
 };
 

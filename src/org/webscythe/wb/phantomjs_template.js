@@ -8,12 +8,11 @@ var initPage = function(page, pageParams) {
     if (pageParams) {
         page.viewportSize = {width: pageParams.width, height: pageParams.height};
         page.paperSize = {format: pageParams.paperformat, orientation: pageParams.paperorientation, border: pageParams.paperborder};
-        page.settings.javascriptEnabled = true;
+        page.settings.javascriptEnabled = pageParams.javascriptenabled == null || pageParams.javascriptenabled;
         page.settings.loadImages = pageParams.loadimages == null || pageParams.loadimages === "true" || pageParams.loadimages === "yes";
         if (pageParams.useragent) {
             page.settings.userAgent = pageParams.useragent;
         }
-        page.settings.userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0";
         if (pageParams.username) {
             page.settings.username = pageParams.username;
         }
@@ -23,8 +22,14 @@ var initPage = function(page, pageParams) {
         if (pageParams.zoomfactor) {
             page.zoomFactor = parseFloat(pageParams.zoomfactor);
         }
+        if (pageParams.websecurityenabled == null) {
+            page.webSecurityEnabled = false;
+        } else {
+            page.webSecurityEnabled = pageParams.websecurityenabled;
+        }
         page.pageParams = pageParams;
     }
+
     page.onError = function (msg, trace) {
         if (currentResponse != null) {
             currentResponse.statusCode = -101;
@@ -67,6 +72,10 @@ var createResponseObject = function(content, msg, isLoaded, startTime) {
     };
 };
 
+var nvl = function(v, dflt) {
+    return v ? v : dflt;
+};
+
 var service = server.listen(${PORT}, function (request, response) {
     currentResponse = response;
     var startTime = new Date().getTime();
@@ -74,17 +83,20 @@ var service = server.listen(${PORT}, function (request, response) {
     var params = request.post;
     var action = params["action"];
     var pageName = params["page"];
+
     var pageParams = {
-        width: params["width"] ? params["width"] : "1280",
-        height: params["width"] ? params["width"] : "720",
-        paperformat: params["paperformat"] ? params["paperformat"] : "A4",
-        paperorientation: params["paperorientation"] ? params["paperorientation"] : "portrait",
-        paperborder: params["paperborder"] ? params["paperborder"] : "0",
-        loadimages: params["loadimages"],
-        useragent: params["useragent"],
+        width: nvl(params["width"], "1280"),
+        height: nvl(params["height"], "1000"),
+        paperformat: nvl(params["paperformat"], "A4"),
+        paperorientation: nvl(params["paperorientation"], "portrait"),
+        paperborder: nvl(params["paperborder"], "0"),
+        loadimages: nvl(params["loadimages"], true),
+        javascriptenabled: nvl(params["javascriptenabled"], true),
+        useragent: nvl(params["useragent"], "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0"),
         username: params["username"],
         password: params["password"],
-        zoomfactor: params["zoomfactor"]
+        zoomfactor: nvl(params["zoomfactor"], 1),
+        websecurityenabled: nvl(params["websecurityenabled"], false)
     };
 
     var page = getPage(pageName, true, pageParams);
@@ -128,6 +140,8 @@ var service = server.listen(${PORT}, function (request, response) {
             response.statusCode = 200;
             response.write(JSON.stringify(page.customHeaders));
             response.close();
+        } else if (action == "rendertofile") {
+            handleRenderToFile(page, response, params["filename"], params["type"]);
         } else if (action == "rendertoimage") {
             handleRenderToImage(page, response, params["type"]);
         } else if (action == "rendertopdf") {
@@ -200,6 +214,17 @@ var handleEvaluate = function(page, response, jsToEvaluate, startTime) {
             return;
         }
     }, 20);
+};
+
+var handleRenderToFile = function(page, response, filename, type) {
+    if (!type) {
+        type = "JPEG";
+    }
+    page.render(filename, type, 100);
+
+    response.statusCode = 200;
+    response.write("");
+    response.close();
 };
 
 var handleRenderToImage = function(page, response, type) {
