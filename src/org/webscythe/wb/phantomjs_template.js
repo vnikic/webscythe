@@ -7,7 +7,7 @@ var initPage = function(page, pageParams) {
         page.viewportSize = {width: pageParams.width, height: pageParams.height};
         page.paperSize = {format: pageParams.paperformat, orientation: pageParams.paperorientation, border: pageParams.paperborder};
         page.settings.javascriptEnabled = pageParams.javascriptenabled == null || pageParams.javascriptenabled;
-        page.settings.loadImages = pageParams.loadimages == null || pageParams.loadimages === "true" || pageParams.loadimages === "yes";
+        page.settings.loadImages = pageParams.loadimages == null || pageParams.loadimages;
         if (pageParams.useragent) {
             page.settings.userAgent = pageParams.useragent;
         }
@@ -139,7 +139,7 @@ var service = server.listen(${PORT}, function (request, response) {
             response.write(JSON.stringify(page.customHeaders));
             response.close();
         } else if (action == "rendertofile") {
-            handleRenderToFile(page, response, params["filename"], params["type"]);
+            handleRenderToFile(page, response, params["filename"], params["type"], params["rect"]);
         } else if (action == "rendertoimage") {
             handleRenderToImage(page, response, params["type"]);
         } else if (action == "rendertopdf") {
@@ -214,9 +214,14 @@ var handleEvaluate = function(page, response, jsToEvaluate) {
     }, 20);
 };
 
-var handleRenderToFile = function(page, response, filename, type) {
+var handleRenderToFile = function(page, response, filename, type, rect) {
     if (!type) {
         type = "JPEG";
+    }
+    if (rect) {
+        page.clipRect = JSON.parse(rect);
+    } else {
+        page.clipRect = null;
     }
     page.render(filename, type, 100);
 

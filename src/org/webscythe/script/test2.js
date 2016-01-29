@@ -2,7 +2,7 @@ var wb = new WebBrowser();
 var sys = new System();
 
 var w = wb.createWindow("https://www.facebook.com/", {height:1000});
-w.includeJS("http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.js");
+//w.includeJS("http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.js");
 
 w.evaluate(function() {
     //$("#email").val("e");

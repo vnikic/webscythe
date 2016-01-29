@@ -124,8 +124,8 @@ public class PhantomBrowser {
         fileOut.close();
     }
 
-    public String render(String pageId, String fileName, String type) {
-        String loadResult = new PhantomBridge(browserPort).render(pageId, fileName, type);
+    public String render(String pageId, String fileName, String type, String rect) {
+        String loadResult = new PhantomBridge(browserPort).render(pageId, fileName, type, rect);
         logger.info("Page rendered to file \"" + fileName + "\".");
         return loadResult;
     }

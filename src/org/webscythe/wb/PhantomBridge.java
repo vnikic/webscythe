@@ -170,8 +170,13 @@ public class PhantomBridge {
         return sendActionRequest("getcustomheaders", new StringPair("page", pageName));
     }
 
-    public String render(String pageName, String fileName, String type) {
-        return sendActionRequest("rendertofile", new StringPair("filename", fileName), new StringPair("type", type), new StringPair("page", pageName));
+    public String render(String pageName, String fileName, String type, String rect) {
+        return sendActionRequest("rendertofile",
+                new StringPair("filename", fileName),
+                new StringPair("type", type),
+                new StringPair("page", pageName),
+                new StringPair("rect", rect)
+        );
     }
 
     public String renderToImage(String type, String pageName) {

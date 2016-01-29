@@ -1,3 +1,16 @@
+var ___toString = function(obj) {
+    if (obj != null) {
+        if (typeof obj === 'number' || typeof obj === 'boolean') {
+            return obj.toString();
+        } else if (toString.call(obj) === '[object Object]' || toString.call(obj) === '[object Array]') {
+            return JSON.stringify(obj);
+        } else {
+            evaluatedArg = "" + obj;
+        }
+    }
+    return "";
+};
+
 var WebBrowser = function () {
     this.__browser = __WB.createBrowser();
     this.__winCounter = 0;
@@ -98,8 +111,14 @@ var WebBrowserWindow = function(browser, id) {
         this.__browser.download(url, this.__id, fileName);
     };
 
-    this.render = function(fileName, type) {
-        this.__browser.render(this.__id, fileName, type);
+    this.render = function(fileName, type, rect) {
+        var rectStr = "";
+        if (rect != null && toString.call(rect) === '[object Object]') {
+            if (rect["top"] && rect["left"] && rect["width"] && rect["height"]) {
+                rectStr = JSON.stringify(rect);
+            }
+        }
+        this.__browser.render(this.__id, fileName, type, rectStr);
     };
 };
 
@@ -124,5 +143,9 @@ var System = function () {
 
     this.println = function(obj) {
         this.__sys.println(obj);
+    };
+
+    this.log = function(obj) {
+        this.__sys.println(___toString(obj));
     };
 };

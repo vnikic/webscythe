@@ -40,6 +40,7 @@ var test5 = w.evaluate(function(o) {
     return o;
 }, {koja:"petar", mica:[1, 2, 3, 4], sajko: 123.222});
 sys.println("test5 = " + test5);
+sys.log(test5);
 sys.println("test5 = " + JSON.stringify(test5));
 sys.println("test5.sasa = " + test5.sasa);
 
@@ -51,3 +52,7 @@ w.evaluate(function() {
 sys.println(w.evaluate(function() {
     return fff();
 }));
+
+sys.println("1. " + parseInt("10"));
+sys.println("2. " + parseInt(12.32));
+sys.println("3. " + parseInt("aaa"));
