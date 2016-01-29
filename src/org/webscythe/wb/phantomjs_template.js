@@ -55,7 +55,7 @@ var getPage = function(pageName, createIfNotExist, pageParams) {
 
 //Returns true if it is a DOM element
 var isElement = function(o){
-    return typeof o.innerHTML === "string";
+    return o != null && typeof o.innerHTML === "string";
 };
 
 var createResponseObject = function(content, msg, isLoaded) {
