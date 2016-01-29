@@ -1,15 +1,13 @@
 var wb = new WebBrowser();
 var sys = new System();
 
-var w = wb.createWindow("http://www.bbc.co.uk/sport/0/");
-sys.sleep(3000);
-sys.saveText(w.getContent(), "c:/temp/webscythe/bbcsport.html");
-var promRect = w.evaluate(function() {
-    return document.getElementById("top-story");
+var w = wb.createWindow("http://www.blic.rs/");
+
+sys.saveText(w.getContent(), "c:/temp/webscythe/blic.html");
+var r = w.evaluate(function() {
+    return document.querySelector("#f_wrap_box").getBoundingClientRect();
+    //return document.querySelector("#f_wrap_box");
 });
-sys.log(promRect);
-
-
-w.render("c:/temp/webscythe/bbcsport.jpg", "JPEG", promRect);
+w.render("c:/temp/webscythe/blic.jpg", "JPEG", r);
 
 

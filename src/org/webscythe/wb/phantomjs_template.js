@@ -53,7 +53,15 @@ var getPage = function(pageName, createIfNotExist, pageParams) {
     return null;
 };
 
+//Returns true if it is a DOM element
+var isElement = function(o){
+    return typeof o.innerHTML === "string";
+};
+
 var createResponseObject = function(content, msg, isLoaded) {
+    if (isElement(content)) {
+        content = content.innerHTML;
+    }
     return {
         "msg" : msg,
         "loaded": isLoaded,
@@ -90,7 +98,7 @@ var service = server.listen(${PORT}, function (request, response) {
     if (page == null) {
         response.statusCode = -101;
         var errMsg = 'Error: ' + (pageName ? 'Page \"' + pageName + '\" does not exist!': 'Default page doesn\'t exist!');
-        response.write(createResponseObject(null, errMsg, false));
+        response.write(JSON.stringify(createResponseObject(null, errMsg, false)));
         response.close();
         return;
     } else {
