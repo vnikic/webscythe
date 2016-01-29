@@ -17,11 +17,12 @@ for (var i = 1; i <= 10; i++) {
         var all = document.querySelectorAll('a[href*="blic-strip-crta-i-pise-marko-somborac"]');
         if (all.length > 1) {
             document.location.href = all[1].href;
-            return true;
+            //return true;
         }
-        return false;
+        return all.length;
     });
-    if (!hasNextPic) {
-        break;
-    }
+    sys.println(hasNextPic);
+    //if (!hasNextPic) {
+    //    break;
+    //}
 }

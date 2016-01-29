@@ -107,7 +107,6 @@ var service = server.listen(${PORT}, function (request, response) {
                 response.statusCode = -101;
                 response.write(msg ? msg : "There is an error executing JavaScript!");
                 response.close();
-                response = null;
             }
         };
     }
@@ -179,7 +178,7 @@ var handleLoad = function(page, response, urlToLoad, pageContent) {
         } else {
             page.onLoadFinished = function (status) {
                 response.statusCode = 200;
-                response.write(page.content);
+                response.write("");
                 response.close();
                 page.onLoadFinished = null;
             };
