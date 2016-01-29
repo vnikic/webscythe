@@ -122,6 +122,8 @@ public class PhantomBrowser {
         connIn.close();
         fileOut.flush();
         fileOut.close();
+
+        logger.info("Resource downloaded and saved as \"" + fileName + " \".");
     }
 
     public String render(String pageId, String fileName, String type, String rect) {
