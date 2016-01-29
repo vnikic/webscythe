@@ -4,6 +4,7 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.webscythe.utils.AppLogging;
 import org.webscythe.utils.CommonUtil;
 
 import java.io.*;
@@ -14,7 +15,7 @@ import java.util.logging.Logger;
 
 public class PhantomBrowser {
 
-    private final static Logger logger = Logger.getLogger(PhantomBrowser.class.getName());
+    private final static Logger logger = AppLogging.getLogger(PhantomBrowser.class);
 
     private static final int MIN_PORT = 20111;
     private static final int MAX_PORT = 40111;
@@ -124,16 +125,14 @@ public class PhantomBrowser {
     }
 
     public String render(String pageId, String fileName, String type) {
-        logger.info("Rendering  page...");
         String loadResult = new PhantomBridge(browserPort).render(pageId, fileName, type);
         logger.info("Page rendered to file \"" + fileName + "\".");
         return loadResult;
     }
 
     public String load(String url, String paramsAsJsonStruct) {
-        logger.info("Loading page " + url);
         String loadResult = new PhantomBridge(browserPort).load(url, paramsAsJsonStruct);
-        logger.info("Page loaded!");
+        logger.info("Page \"" + url + "\" loaded!");
         return loadResult;
     }
 

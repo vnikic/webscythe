@@ -1,9 +1,8 @@
 var wb = new WebBrowser();
 var sys = new System();
 
-var w = wb.createWindow("https://www.facebook.com/", {height:4000});
+var w = wb.createWindow("https://www.facebook.com/", {height:1000});
 w.includeJS("http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.js");
-sys.sleep(5000);
 
 w.evaluate(function() {
     //$("#email").val("e");
@@ -15,12 +14,12 @@ w.evaluate(function() {
 });
 sys.saveText(w.getContent(), "c:/temp/webscythe/fb.html");
 
-sys.print("FIRST LINK TEXT IS: [" + w.evaluate(function() {
+sys.println("FIRST LINK TEXT IS: [" + w.evaluate(function() {
     var el = document.querySelector("a");
     return el.innerHTML;
 }) + "]");
 
-sys.sleep(5000);
+sys.sleep(2000);
 w.render("c:/temp/webscythe/fb.jpg");
 
 

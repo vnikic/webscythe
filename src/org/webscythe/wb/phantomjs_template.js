@@ -2,8 +2,6 @@ var pageEvaluate = function(expression) {
     return eval.apply(window, [expression]);
 };
 
-var currentResponse = null;
-
 var initPage = function(page, pageParams) {
     if (pageParams) {
         page.viewportSize = {width: pageParams.width, height: pageParams.height};
@@ -30,14 +28,6 @@ var initPage = function(page, pageParams) {
         page.pageParams = pageParams;
     }
 
-    page.onError = function (msg, trace) {
-        if (currentResponse != null) {
-            currentResponse.statusCode = -101;
-            currentResponse.write(msg ? msg : "There is an error executing JavaScript!");
-            currentResponse.close();
-            currentResponse = null;
-        }
-    };
     return page;
 };
 
@@ -63,9 +53,8 @@ var getPage = function(pageName, createIfNotExist, pageParams) {
     return null;
 };
 
-var createResponseObject = function(content, msg, isLoaded, startTime) {
+var createResponseObject = function(content, msg, isLoaded) {
     return {
-        "time": new Date().getTime() - startTime,
         "msg" : msg,
         "loaded": isLoaded,
         "content": content
@@ -77,9 +66,6 @@ var nvl = function(v, dflt) {
 };
 
 var service = server.listen(${PORT}, function (request, response) {
-    currentResponse = response;
-    var startTime = new Date().getTime();
-
     var params = request.post;
     var action = params["action"];
     var pageName = params["page"];
@@ -104,9 +90,18 @@ var service = server.listen(${PORT}, function (request, response) {
     if (page == null) {
         response.statusCode = -101;
         var errMsg = 'Error: ' + (pageName ? 'Page \"' + pageName + '\" does not exist!': 'Default page doesn\'t exist!');
-        response.write(createResponseObject(null, errMsg, false, startTime));
+        response.write(createResponseObject(null, errMsg, false));
         response.close();
         return;
+    } else {
+        page.onError = function (msg, trace) {
+            if (response != null) {
+                response.statusCode = -101;
+                response.write(msg ? msg : "There is an error executing JavaScript!");
+                response.close();
+                response = null;
+            }
+        };
     }
 
     try {
@@ -121,7 +116,7 @@ var service = server.listen(${PORT}, function (request, response) {
         } else if (action == "load") {
             handleLoad(page, response, decodeURI(params["url"]), params["content"])
         } else if (action == "eval") {
-            handleEvaluate(page, response, params["exp"], startTime);
+            handleEvaluate(page, response, params["exp"]);
         } else if (action == "includejs") {
             page.includeJs(decodeURI(params["url"]), function() {
                 response.statusCode = 200;
@@ -190,10 +185,10 @@ var handleLoad = function(page, response, urlToLoad, pageContent) {
 };
 
 
-var handleEvaluate = function(page, response, jsToEvaluate, startTime) {
+var handleEvaluate = function(page, response, jsToEvaluate) {
     page.onLoadFinished = function(status) {
         response.statusCode = 200;
-        response.write(JSON.stringify(createResponseObject(null, "ok", true, startTime)));
+        response.write(JSON.stringify(createResponseObject(null, "ok", true)));
         response.close();
         page.onLoadFinished = null;
         page.onNavigationRequested = null;
@@ -210,7 +205,7 @@ var handleEvaluate = function(page, response, jsToEvaluate, startTime) {
     window.setTimeout(function () {
         if (!isNavigationRequested) {
             response.statusCode = 200;
-            response.write(JSON.stringify(createResponseObject(evalResult, "ok", false, startTime)));
+            response.write(JSON.stringify(createResponseObject(evalResult, "ok", false)));
             response.close();
             page.onLoadFinished = null;
             page.onNavigationRequested = null;
