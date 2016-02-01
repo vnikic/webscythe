@@ -193,9 +193,10 @@ var handleLoad = function(page, response, urlToLoad, pageContent) {
 
 
 var handleEvaluate = function(page, response, jsToEvaluate) {
+    var evalResult = null;
     page.onLoadFinished = function(status) {
         response.statusCode = 200;
-        response.write(JSON.stringify(createResponseObject(null, "ok", true)));
+        response.write(JSON.stringify(createResponseObject(evalResult, "ok", true)));
         response.close();
         page.onLoadFinished = null;
         page.onNavigationRequested = null;
@@ -208,7 +209,7 @@ var handleEvaluate = function(page, response, jsToEvaluate) {
             page.onNavigationRequested = null;
         }
     };
-    var evalResult = page.evaluate(pageEvaluate, jsToEvaluate);
+    evalResult = page.evaluate(pageEvaluate, jsToEvaluate);
     window.setTimeout(function () {
         if (!isNavigationRequested) {
             response.statusCode = 200;
