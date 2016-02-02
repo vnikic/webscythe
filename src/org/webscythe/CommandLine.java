@@ -8,7 +8,7 @@ import javax.script.ScriptException;
 public class CommandLine {
 
     public static void main(String[] args) throws ScriptException {
-        String testScript = CommonUtil.readResourceAsString("/org/webscythe/script/msomborac.js");
+        String testScript = CommonUtil.readResourceAsString("/org/webscythe/script/test4.js");
         new ScriptExecutor().execute(testScript);
         System.exit(0);
     }

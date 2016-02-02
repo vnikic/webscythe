@@ -1,5 +1,27 @@
+//var fs = require('fs');
+
 var pageEvaluate = function(expression) {
     return eval.apply(window, [expression]);
+};
+
+var addDocEvents = function() {
+    document.addEventListener('DOMContentLoaded', function() {
+       document.___content___loaded___ = true;
+    });
+};
+
+var clearDocLoadedIndicator = function() {
+   document.___content___loaded___ = false;
+};
+
+var repeaterFunc = function(isReadyChecker, response, responseTxt) {
+    if (isReadyChecker()) {
+        response.statusCode = 200;
+        response.write(responseTxt);
+        response.close();
+    } else {
+        window.setTimeout(repeaterFunc, 20, isReadyChecker, response, responseTxt);
+    }
 };
 
 var initPage = function(page, pageParams) {
@@ -27,6 +49,22 @@ var initPage = function(page, pageParams) {
         }
         page.pageParams = pageParams;
     }
+
+    page.neverLoaded = true;
+
+    page.onInitialized = function() {
+        page.evaluate(addDocEvents, false);
+    };
+
+    page.checkIfDocContentIsLoaded = function() {
+        if (page.neverLoaded) {
+            return true;
+        } else {
+            return page.evaluate(function() {
+                return document.___content___loaded___ ? true : false;
+            });
+        }
+    };
 
     return page;
 };
@@ -96,18 +134,23 @@ var service = server.listen(${PORT}, function (request, response) {
     var page = getPage(pageName, true, pageParams);
 
     if (page == null) {
-        response.statusCode = -101;
+        response.statusCode = -100;
         var errMsg = 'Error: ' + (pageName ? 'Page \"' + pageName + '\" does not exist!': 'Default page doesn\'t exist!');
         response.write(JSON.stringify(createResponseObject(null, errMsg, false)));
         response.close();
         return;
     } else {
+//        page.onError = function (msg, trace) {
+//            if (response != null) {
+//                response.statusCode = -101;
+//                response.write(msg ? msg : "There is an error executing JavaScript!");
+//                response.close();
+//            }
+//        };
         page.onError = function (msg, trace) {
-            if (response != null) {
-                response.statusCode = -101;
-                response.write(msg ? msg : "There is an error executing JavaScript!");
-                response.close();
-            }
+            page.evaluate(function() {
+                document.___content___loaded___ = true;
+            }, false);
         };
     }
 
@@ -162,13 +205,14 @@ var service = server.listen(${PORT}, function (request, response) {
             response.close();
         }
     } catch (err) {
-        response.statusCode = -101;
+        response.statusCode = -102;
         response.write('Error:' + err);
         response.close();
     }
 });
 
 var handleLoad = function(page, response, urlToLoad, pageContent) {
+    page.neverLoaded = false;
     if (urlToLoad) {
         if (pageContent) {
             page.setContent(pageContent, urlToLoad);
@@ -176,12 +220,7 @@ var handleLoad = function(page, response, urlToLoad, pageContent) {
             response.write(pageContent);
             response.close();
         } else {
-            page.onLoadFinished = function (status) {
-                response.statusCode = 200;
-                response.write("");
-                response.close();
-                page.onLoadFinished = null;
-            };
+            repeaterFunc(page.checkIfDocContentIsLoaded, response, "");
             page.open(encodeURI(urlToLoad));
         }
     } else {
@@ -194,31 +233,20 @@ var handleLoad = function(page, response, urlToLoad, pageContent) {
 
 var handleEvaluate = function(page, response, jsToEvaluate) {
     var evalResult = null;
-    page.onLoadFinished = function(status) {
-        response.statusCode = 200;
-        response.write(JSON.stringify(createResponseObject(evalResult, "ok", true)));
-        response.close();
-        page.onLoadFinished = null;
-        page.onNavigationRequested = null;
-        return;
-    };
     var isNavigationRequested = false;
     page.onNavigationRequested = function(url, type, willNavigate, main) {
         if (willNavigate && main) {
             isNavigationRequested = true;
-            page.onNavigationRequested = null;
         }
     };
     evalResult = page.evaluate(pageEvaluate, jsToEvaluate);
+
     window.setTimeout(function () {
-        if (!isNavigationRequested) {
-            response.statusCode = 200;
-            response.write(JSON.stringify(createResponseObject(evalResult, "ok", false)));
-            response.close();
-            page.onLoadFinished = null;
-            page.onNavigationRequested = null;
-            return;
+        page.onNavigationRequested = null;
+        if (isNavigationRequested) {
+            page.evaluate(clearDocLoadedIndicator, false);
         }
+        repeaterFunc(page.checkIfDocContentIsLoaded, response, JSON.stringify(createResponseObject(evalResult, "ok", false)));
     }, 20);
 };
 

@@ -18,7 +18,6 @@ win1.evaluate(function() {
 sys.println("URL 1 = " + win1.getUrl());
 sys.println("URL 2 = " + win2.getUrl());
 
-sys.sleep(1000);
 win1.render("c:/temp/webscythe/scoring.jpg");
 win2.render("c:/temp/webscythe/facebook.jpg");
 

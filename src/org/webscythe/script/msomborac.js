@@ -3,13 +3,14 @@ var sys = new System();
 
 var w = wb.createWindow("http://www.blic.rs/");
 
+sys.saveText(w.getContent(), "c:/temp/webscythe/blic.html");
+w.render("c:/temp/webscythe/blic.jpg");
+
 w.evaluate(function() {
     document.location.href = document.querySelectorAll("#blic_naslovna_print")[1].href;
 });
 
-sys.sleep(500);
-
-for (var i = 1; i <= 200; i++) {
+for (var i = 1; i <= 100; i++) {
     var imgUrl = w.evaluate(function() {
         return document.querySelector(".mainPhotoImg").src;
     });
