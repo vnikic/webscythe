@@ -2,7 +2,10 @@ var wb = new WebBrowser();
 var sys = new System();
 
 var w = wb.createWindow("https://www.facebook.com/");
+
+sys.println("Now trying to include JQuery...");
 w.includeJS("http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.js");
+sys.println("Finished including JQuery!");
 
 w.evaluate(function() {
 //    $("#email").val("u");

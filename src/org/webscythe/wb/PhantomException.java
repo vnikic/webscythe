@@ -26,7 +26,7 @@ public class PhantomException extends RuntimeException {
         if (errObject != null) {
             msg = errObject.optString("msg", msg);
         }
-        return "Phantom: " + msg;
+        return "BROWSER: " + msg;
     }
 
 }
