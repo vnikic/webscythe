@@ -57,6 +57,8 @@ public class PhantomBridge {
             } else {
                 throw new PhantomException(result.value);
             }
+        } catch (PhantomException e) {
+            throw e;
         } catch (Exception e) {
             throw new PhantomException(e);
         }

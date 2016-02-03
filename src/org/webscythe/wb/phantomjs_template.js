@@ -14,13 +14,11 @@ var clearDocLoadedIndicator = function() {
    document.___content___loaded___ = false;
 };
 
-var repeaterFunc = function(isReadyChecker, response, responseTxt) {
+var repeaterFunc = function(isReadyChecker, funcWhenReady) {
     if (isReadyChecker()) {
-        response.statusCode = 200;
-        response.write(responseTxt);
-        response.close();
+        funcWhenReady();
     } else {
-        window.setTimeout(repeaterFunc, 20, isReadyChecker, response, responseTxt);
+        window.setTimeout(repeaterFunc, 20, isReadyChecker, funcWhenReady);
     }
 };
 
@@ -140,13 +138,6 @@ var service = server.listen(${PORT}, function (request, response) {
         response.close();
         return;
     } else {
-//        page.onError = function (msg, trace) {
-//            if (response != null) {
-//                response.statusCode = -101;
-//                response.write(msg ? msg : "There is an error executing JavaScript!");
-//                response.close();
-//            }
-//        };
         page.onError = function (msg, trace) {
             page.evaluate(function() {
                 document.___content___loaded___ = true;
@@ -168,14 +159,17 @@ var service = server.listen(${PORT}, function (request, response) {
         } else if (action == "eval") {
             handleEvaluate(page, response, params["exp"]);
         } else if (action == "includejs") {
-            page.includeJs(decodeURI(params["url"]), function() {
+            var jsUrl = decodeURI(params["url"]);
+            page.onResourceError = function(resourceError) {
+                response.statusCode = -105;
+                response.write('Unable to load resource (#' + resourceError.id + 'URL:' + resourceError.url + ')');
+                response.close();
+            };
+            page.includeJs(jsUrl, function() {
                 response.statusCode = 200;
                 response.write("");
                 response.close();
             });
-            response.statusCode = 200;
-            response.write("");
-            response.close();
         } else if (action == "getcookies") {
             response.statusCode = 200;
             response.write(JSON.stringify(page.cookies));
@@ -220,8 +214,23 @@ var handleLoad = function(page, response, urlToLoad, pageContent) {
             response.write(pageContent);
             response.close();
         } else {
-            repeaterFunc(page.checkIfDocContentIsLoaded, response, "");
-            page.open(encodeURI(urlToLoad));
+            page.open(encodeURI(urlToLoad), function(status) {
+                if (status == "fail") {
+                    response.statusCode = 300;
+                    var responseObj = {
+                        "url": urlToLoad,
+                        "msg": "Error loading \"" + urlToLoad + "\"!",
+                        "status": "fail"
+                    };
+                    response.write(JSON.stringify(responseObj));
+                    response.close();
+                }
+            });
+            repeaterFunc(page.checkIfDocContentIsLoaded, function() {
+                response.statusCode = 200;
+                response.write(JSON.stringify({"url": urlToLoad, "status": "ok"}));
+                response.close();
+            });
         }
     } else {
         response.statusCode = 201;
@@ -246,7 +255,11 @@ var handleEvaluate = function(page, response, jsToEvaluate) {
         if (isNavigationRequested) {
             page.evaluate(clearDocLoadedIndicator, false);
         }
-        repeaterFunc(page.checkIfDocContentIsLoaded, response, JSON.stringify(createResponseObject(evalResult, "ok", false)));
+        repeaterFunc(page.checkIfDocContentIsLoaded, function() {
+            response.statusCode = 200;
+            response.write( JSON.stringify(createResponseObject(evalResult, "ok", false)) );
+            response.close();
+        });
     }, 20);
 };
 
